@@ -1,0 +1,71 @@
+/* Display settings sheet. Uses its own set-* classes: the legacy .row/.seg/.settings rules are
+   shared with the word list (glass cards, overflow:hidden, backdrop-filter) and clipped these controls. */
+.set{display:grid;gap:1rem;padding:.2rem 1.25rem 1.6rem}
+
+/* ---------- live preview (stays visible while adjusting sizes) ---------- */
+.set-preview{
+  --hdr:4rem; /* height of the sticky dialog header */
+  position:sticky;top:var(--hdr);z-index:1;
+  display:grid;gap:.1rem;padding:.6rem 1.1rem .75rem;border-radius:1.25rem;
+  background:var(--surf);border:1px solid var(--line);
+  box-shadow:0 10px 30px -14px color-mix(in srgb,#000 22%,transparent);
+}
+/* Arabic gets a full-width line so it never wraps, whatever size the sliders are set to. */
+.set-preview__ar{order:-1;text-align:right;font-size:var(--ar-size);line-height:1.55;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.set-preview__text{display:grid;gap:.05rem;min-width:0}
+@media (max-height:720px){.set-preview{position:static}}
+
+/* ---------- groups ---------- */
+.set-group{
+  display:grid;gap:0;margin:0;min-width:0;padding:.35rem 1.1rem;
+  border:1px solid var(--line);border-radius:1.25rem;background:color-mix(in srgb,var(--surf) 70%,transparent);
+}
+.set-group legend{padding:0 .5rem;margin-left:-.5rem;font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.set-field{display:grid;gap:.55rem;min-width:0;padding:.95rem 0}
+.set-field + .set-field,.set-pair + .set-field{border-top:1px solid var(--line)}
+.set-pair{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.set-pair .set-field + .set-field{border-top:1px solid var(--line)}
+@media (min-width:480px){
+  .set-pair{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:1rem}
+  .set-pair .set-field + .set-field{border-top:0}
+}
+
+.set-label{font-size:.9rem;font-weight:600;line-height:1.35;min-width:0}
+.set-head{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem}
+.set-value{flex:none;padding:.1rem .6rem;border-radius:999px;background:color-mix(in srgb,var(--acc) 12%,transparent);color:color-mix(in srgb,var(--acc) 78%,var(--ink));font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ---------- controls ---------- */
+.set-select{
+  width:100%;min-height:2.75rem;padding:.55rem 2.2rem .55rem .85rem;border:1px solid var(--line);border-radius:.9rem;
+  background:var(--surf);color:var(--ink);font:inherit;font-size:.95rem;
+}
+.set-range{display:block;width:100%;height:2rem;margin:0;accent-color:var(--acc);cursor:pointer}
+
+.set-seg{display:flex;flex-wrap:wrap;gap:.45rem}
+.set-seg button{
+  min-height:2.5rem;padding:.4rem 1rem;border:1px solid var(--line);border-radius:999px;
+  background:var(--surf);color:var(--mut);font-size:.88rem;font-weight:600;white-space:nowrap;
+}
+.set-seg button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+@media (hover:hover){.set-seg button:not([aria-pressed=true]):hover{color:var(--ink);border-color:var(--mut)}}
+
+.set-swatches{display:flex;flex-wrap:wrap;gap:.65rem}
+.set-swatches button{width:2.5rem;height:2.5rem;border-radius:50%;border:3px solid var(--surf);box-shadow:0 0 0 1px var(--line)}
+.set-swatches button[aria-pressed=true]{box-shadow:0 0 0 2px var(--ink)}
+
+/* Toggle switch (native checkbox underneath, so keyboard and screen readers keep working) */
+.set-switch{display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer}
+.set-switch input{
+  appearance:none;-webkit-appearance:none;flex:none;position:relative;width:2.9rem;height:1.7rem;margin:0;border-radius:999px;
+  background:color-mix(in srgb,var(--ink) 18%,transparent);cursor:pointer;transition:background .2s;
+}
+.set-switch input::after{
+  content:"";position:absolute;top:.2rem;left:.2rem;width:1.3rem;height:1.3rem;border-radius:50%;
+  background:#fff;box-shadow:0 1px 4px #0004;transition:transform .2s;
+}
+.set-switch input:checked{background:var(--acc)}
+.set-switch input:checked::after{transform:translateX(1.2rem)}
+
+.set :focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.set-reset{justify-self:center;min-height:2.75rem}
+@media (prefers-reduced-motion:reduce){.set-switch input,.set-switch input::after{transition:none}}

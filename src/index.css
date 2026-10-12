@@ -154,7 +154,8 @@ body{min-width:320px;min-height:100svh;background:
 .btn{background:var(--glass-strong);border-color:var(--glass-line);backdrop-filter:blur(12px)}
 .foot{padding:3.2rem 0 1rem}
 dialog{background:var(--glass-strong);border:1px solid var(--glass-line);backdrop-filter:blur(26px) saturate(140%);-webkit-backdrop-filter:blur(26px) saturate(140%)}
-.dlg header{background:color-mix(in srgb,var(--glass-strong) 90%,transparent);backdrop-filter:blur(18px)}
+/* Opaque: scrolling sheet content (and the sticky settings preview) must not show through the header. */
+.dlg header{background:var(--bg)}
 .onb{max-width:38rem;padding:5rem 1rem 2rem}
 .onb::before,.onb::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(8px);pointer-events:none}
 .onb::before{width:20rem;height:20rem;left:-10rem;top:5rem;background:color-mix(in srgb,var(--acc) 22%,transparent)}

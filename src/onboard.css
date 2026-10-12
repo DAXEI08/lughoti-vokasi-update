@@ -1,0 +1,59 @@
+/* Major picker - isolated from the legacy .onb/.pick rules. Theme tokens only. */
+.major{
+  position:relative;display:grid;place-items:center;
+  min-height:100svh;min-height:100dvh;
+  padding:max(2.75rem,calc(env(safe-area-inset-top) + 2rem)) max(1.1rem,env(safe-area-inset-right)) max(2.75rem,calc(env(safe-area-inset-bottom) + 1.5rem)) max(1.1rem,env(safe-area-inset-left));
+}
+.major__close{position:absolute;top:max(1rem,env(safe-area-inset-top));right:max(1rem,env(safe-area-inset-right));z-index:2}
+.major__inner{display:grid;justify-items:center;gap:1.25rem;width:min(100%,26rem);text-align:center}
+
+.major__reveal{animation:majorRise .7s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 80ms)}
+@keyframes majorRise{from{opacity:0;transform:translate3d(0,16px,0)}}
+
+/* ---------- heading ---------- */
+.major__head{display:grid;justify-items:center;gap:.55rem}
+.major__eyebrow{margin:0;color:var(--mut);font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.major__title{margin:0;font-size:clamp(2.1rem,10vw,3.3rem);font-weight:700;line-height:1.05;letter-spacing:-.04em;text-wrap:balance}
+.major__title span{color:var(--acc)}
+.major__ask{margin:-.1rem 0 0;font-family:var(--ar-font);font-size:1.6rem;line-height:1.6;color:color-mix(in srgb,var(--acc) 72%,var(--ink))}
+.major__sub{margin:.15rem 0 0;max-width:24rem;color:var(--mut);font-size:.88rem;line-height:1.6;text-wrap:pretty}
+
+/* ---------- cards ---------- */
+.major__grid{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem;width:100%}
+.major__card{
+  display:grid;justify-items:center;align-content:center;gap:.2rem;
+  min-height:5.9rem;padding:.8rem 1rem .85rem;border-radius:1.45rem;text-align:center;color:var(--ink);
+  background:linear-gradient(150deg,color-mix(in srgb,var(--surf) 74%,transparent),color-mix(in srgb,var(--surf) 48%,transparent));
+  border:1.5px solid color-mix(in srgb,var(--ink) 10%,transparent);
+  box-shadow:0 14px 38px -16px color-mix(in srgb,var(--mc) 40%,transparent),inset 0 1px 0 color-mix(in srgb,#fff 55%,transparent);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+:root[data-theme=dark] .major__card{border-color:color-mix(in srgb,#fff 11%,transparent);box-shadow:0 16px 40px -16px #000b,inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent)}
+.major__card[aria-pressed=true]{border-color:var(--mc);background:linear-gradient(150deg,color-mix(in srgb,var(--mc) 16%,var(--surf)),color-mix(in srgb,var(--mc) 8%,var(--surf)))}
+.major__card:active{transform:scale(.98)}
+@media (hover:hover){.major__card:hover{transform:translateY(-3px);border-color:var(--mc)}}
+.major__card:focus-visible{outline:2px solid var(--mc);outline-offset:3px}
+
+.major__dot{flex:none;width:.5rem;height:.5rem;border-radius:50%;background:var(--mc)}
+.major__name{font-size:clamp(1rem,4.3vw,1.12rem);font-weight:700;line-height:1.25;letter-spacing:-.01em;text-wrap:balance}
+/* Arabic: no letter-spacing, roomy line-height so the script never clips or collides. */
+.major__name-ar{font-family:var(--ar-font);font-size:1.35rem;line-height:1.6;letter-spacing:0;color:color-mix(in srgb,var(--ink) 74%,var(--mut))}
+.major__count{display:inline-flex;align-items:center;gap:.4rem;margin-top:.3rem;padding:.12rem .7rem;border-radius:999px;background:color-mix(in srgb,var(--mc) 13%,transparent);color:color-mix(in srgb,var(--mc) 82%,var(--ink));font-size:.72rem;font-weight:700}
+
+@media (min-width:640px){
+  .major__inner{width:min(100%,42rem);gap:2rem}
+  .major__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}
+  .major__card{min-height:7.4rem}
+}
+/* Short phones: drop the helper paragraph so all four majors still fit without scrolling. */
+@media (max-height:780px) and (max-width:639px){
+  .major{padding-block:2.2rem 1.5rem}
+  .major__inner{gap:.9rem}
+  .major__sub{display:none}
+  .major__card{min-height:5.2rem;padding-block:.65rem}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .major__card{background:var(--surf)}
+}
+@media (prefers-reduced-motion:reduce){.major__reveal{animation:none!important}.major__card{transition:none!important}}
