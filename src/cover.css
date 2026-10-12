@@ -1,0 +1,37 @@
+/* Isolated immersive typography cover */
+.immersive-cover{position:relative;width:100%;min-height:100svh;overflow:hidden;isolation:isolate;display:grid;grid-template-rows:auto 1fr auto;padding:max(1.35rem,env(safe-area-inset-top)) clamp(1.15rem,5vw,3.5rem) max(1.35rem,env(safe-area-inset-bottom));color:var(--ink);background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 97%,var(--acc) 3%),var(--bg) 52%,color-mix(in srgb,var(--bg) 96%,var(--gold) 4%))}
+.immersive-cover::before{content:"";position:absolute;inset:0;z-index:-4;pointer-events:none;background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 3.5%,transparent) 1px,transparent 1px),linear-gradient(color-mix(in srgb,var(--ink) 3.5%,transparent) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%);opacity:.65}
+.immersive-cover__glow{position:absolute;z-index:-3;pointer-events:none;border-radius:50%;filter:blur(18px)}
+.immersive-cover__glow--top{width:min(76vw,44rem);aspect-ratio:1;top:-38%;right:-24%;background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.immersive-cover__glow--bottom{width:min(66vw,38rem);aspect-ratio:1;left:-25%;bottom:-32%;background:color-mix(in srgb,var(--gold) 11%,transparent)}
+.immersive-cover__school{position:relative;z-index:3;display:flex;align-items:center;gap:.75rem;width:max-content;max-width:100%;color:var(--mut);font-size:clamp(.65rem,2.35vw,.78rem);font-weight:700;letter-spacing:.11em;text-transform:uppercase;white-space:nowrap}
+.immersive-cover__school-line{width:clamp(1.8rem,8vw,4rem);height:1px;background:color-mix(in srgb,var(--ink) 30%,transparent)}
+.immersive-cover__hero{position:relative;z-index:2;align-self:center;display:grid;justify-items:start;width:min(100%,70rem);margin-inline:auto;padding-block:7svh 9svh}
+.immersive-cover__kicker{margin:0 0 clamp(.8rem,2.2vh,1.25rem);color:color-mix(in srgb,var(--mut) 88%,var(--ink));font-size:clamp(.68rem,2vw,.82rem);font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.immersive-cover__arabic{margin:0;font-family:var(--ar-font);font-size:clamp(7.2rem,31vw,18rem);font-weight:700;line-height:.72;letter-spacing:-.055em;color:var(--ink);white-space:nowrap;transform:translateX(-.035em);text-shadow:0 22px 70px color-mix(in srgb,var(--acc) 8%,transparent)}
+.immersive-cover__latin{display:grid;margin-top:clamp(1rem,3.2vh,2rem);line-height:.78;font-size:clamp(2.8rem,13vw,7.8rem);font-weight:850;letter-spacing:-.075em}
+.immersive-cover__latin span:first-child{color:var(--ink)}
+.immersive-cover__latin span:last-child{color:color-mix(in srgb,var(--acc) 76%,var(--ink));transform:translateX(clamp(1.2rem,8vw,6.5rem))}
+.immersive-cover__vocabulary{position:absolute;inset:0;z-index:-1;pointer-events:none;display:grid;align-content:space-evenly;gap:4svh;padding-block:9svh;opacity:.095;mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%)}
+.immersive-cover__lane{width:125%;margin-left:-12.5%;overflow:hidden;transform:rotate(-2deg)}
+.immersive-cover__lane:nth-child(2){transform:rotate(1.4deg)}.immersive-cover__lane:nth-child(3){transform:rotate(-.8deg)}.immersive-cover__lane:nth-child(4){transform:rotate(1.8deg)}
+.immersive-cover__track{display:flex;width:max-content;gap:3.5rem;will-change:transform;animation:immersiveVocabulary 58s linear infinite}
+.immersive-cover__lane--reverse .immersive-cover__track{animation-direction:reverse;animation-duration:66s}
+.immersive-cover__group{display:flex;flex:none;align-items:center;gap:3.5rem}
+.immersive-cover__group span{font-family:var(--ar-font);font-size:clamp(2.2rem,8vw,5.3rem);line-height:1;color:var(--ink);white-space:nowrap}
+@keyframes immersiveVocabulary{to{transform:translateX(calc(-50% - 1.75rem))}}
+.immersive-cover__footer{position:relative;z-index:3;display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;width:min(100%,70rem);margin-inline:auto}
+.immersive-cover__author{display:grid;gap:.08rem;text-align:left}
+.immersive-cover__author span{color:var(--mut);font-size:.62rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+.immersive-cover__author strong{font-size:clamp(.82rem,3vw,1rem);font-weight:700;letter-spacing:-.018em}
+.immersive-cover__start{display:inline-flex;align-items:center;justify-content:center;gap:.65rem;min-width:7.2rem;padding:.82rem 1.05rem;border:1px solid color-mix(in srgb,var(--ink) 10%,transparent);border-radius:999px;background:color-mix(in srgb,var(--surf) 58%,transparent);color:var(--ink);box-shadow:0 10px 32px color-mix(in srgb,#000 10%,transparent),inset 0 1px 0 color-mix(in srgb,#fff 46%,transparent);backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%);font-size:.88rem;font-weight:750}
+.immersive-cover__start svg{width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.immersive-cover__start:hover{transform:translateY(-2px);background:color-mix(in srgb,var(--surf) 72%,transparent)}
+.immersive-cover__start:hover svg{transform:translateX(3px)}.immersive-cover__start:active{transform:translateY(0) scale(.98)}
+.immersive-cover__start:focus-visible{outline:2px solid var(--acc);outline-offset:4px;border-radius:999px}
+:root[data-theme=dark] .immersive-cover{background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 94%,var(--acc) 6%),var(--bg) 54%,color-mix(in srgb,var(--bg) 95%,var(--gold) 5%))}
+:root[data-theme=dark] .immersive-cover::before{opacity:.28}:root[data-theme=dark] .immersive-cover__vocabulary{opacity:.075}
+:root[data-theme=dark] .immersive-cover__start{background:color-mix(in srgb,var(--surf) 46%,transparent);border-color:color-mix(in srgb,#fff 10%,transparent);box-shadow:0 12px 38px #0005,inset 0 1px 0 color-mix(in srgb,#fff 10%,transparent)}
+@media(max-width:560px){.immersive-cover{padding-inline:1rem}.immersive-cover__hero{padding-block:6svh 8svh}.immersive-cover__arabic{font-size:clamp(6.7rem,35vw,10rem)}.immersive-cover__latin{font-size:clamp(2.55rem,14.5vw,4.6rem)}.immersive-cover__latin span:last-child{transform:translateX(1.25rem)}.immersive-cover__footer{align-items:flex-end}.immersive-cover__author strong{max-width:9.6rem;line-height:1.25}.immersive-cover__school{letter-spacing:.075em}}
+@media(max-height:650px){.immersive-cover__hero{padding-block:3.5svh 5svh}.immersive-cover__arabic{font-size:clamp(5.8rem,26vh,9rem)}.immersive-cover__latin{margin-top:.7rem;font-size:clamp(2.2rem,10vh,4.2rem)}}
+@media(prefers-reduced-motion:reduce){.immersive-cover__track{animation:none!important}}
