@@ -36,7 +36,7 @@ export default function App() {
   const p = { ...DEFAULTS, ...prefs }
   const [seen, setSeen] = usePersisted('seen', false)
   const [mine, setMine] = usePersisted<Major | 'all' | null>('mine', null)
-  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>(!seen ? 'cover' : mine == null ? 'pick' : 'app')
+  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>(!seen ? 'cover' : mine == null || mine === 'all' ? 'pick' : 'app')
   const [topic, setTopic] = useState('all')
   const [favs, setFavs] = usePersisted<string[]>('favs', [])
   const [recent, setRecent] = usePersisted<string[]>('recent', [])
@@ -45,7 +45,7 @@ export default function App() {
   const [tries, setTries] = useState(0)
   const [q, setQ] = useState('')
   const dq = useDeferredValue(q)
-  const [major, setMajor] = useState<Major | 'all'>(mine ?? 'all')
+  const [major, setMajor] = useState<Major>(mine && mine !== 'all' ? mine : 'RPL')
   const [scope, setScope] = useState<Scope>('all')
   const [lim, setLim] = useState(60)
   const [sel, setSel] = useState<Word | null>(null)
@@ -84,31 +84,29 @@ export default function App() {
   }, [shareW, style, p.arFont])
 
   const byId = useMemo(() => new Map(data?.words.map(w => [w.id, w])), [data])
-  const hits = useMemo(() => (data ? search(data.words, dq) : []), [data, dq])
+  const activeWords = useMemo(() => (data ? data.words.filter(w => w.major === major) : []), [data, major])
+  const hits = useMemo(() => search(activeWords, dq), [activeWords, dq])
   const base = useMemo(() => {
     if (scope === 'all') return hits
     const ids = scope === 'fav' ? favs : recent; const set = new Set(ids)
     const l = hits.filter(h => set.has(h.w.id)); return dq ? l : l.sort((a, b) => ids.indexOf(a.w.id) - ids.indexOf(b.w.id))
   }, [hits, scope, favs, recent, dq])
-  const counts = useMemo(() => { const c: Record<string, number> = { all: base.length }; base.forEach(h => { c[h.w.major] = (c[h.w.major] || 0) + 1 }); return c }, [base])
-  const byMajor = useMemo(() => (major === 'all' ? base : base.filter(h => h.w.major === major)), [base, major])
-  const topics = useMemo(() => { const m = new Map<string, number>(); byMajor.forEach(h => { if (h.w.topic) m.set(h.w.topic, (m.get(h.w.topic) || 0) + 1) }); return [...m].sort((a, b) => b[1] - a[1]) }, [byMajor])
-  const shown = useMemo(() => (topic === 'all' ? byMajor : byMajor.filter(h => h.w.topic === topic)), [byMajor, topic])
+  const topics = useMemo(() => { const m = new Map<string, number>(); base.forEach(h => { if (h.w.topic) m.set(h.w.topic, (m.get(h.w.topic) || 0) + 1) }); return [...m].sort((a, b) => b[1] - a[1]) }, [base])
+  const shown = useMemo(() => (topic === 'all' ? base : base.filter(h => h.w.topic === topic)), [base, topic])
   const daily = useMemo(() => {
     if (!data) return null
-    const pool = mine && mine !== 'all' ? data.words.filter(w => w.major === mine) : data.words
-    return dailyWord(pool.length ? pool : data.words)
-  }, [data, mine])
+    return activeWords.length ? dailyWord(activeWords) : null
+  }, [data, activeWords])
   const similar = sel && data ? data.similar.filter(s => (s.a1 === sel.ar || s.a2 === sel.ar) && (s.scope === 'all' || s.scope === sel.major || !s.scope)) : []
   const coverWords = useMemo(() => (data ? data.words.filter((_, i) => i % 23 === 0).map(w => w.ar) : []), [data])
 
   useEffect(() => setLim(60), [dq, major, scope, topic])
   useEffect(() => setTopic('all'), [major])
   useEffect(() => { if (topic !== 'all' && !topics.some(t => t[0] === topic)) setTopic('all') }, [topic, topics])
-  const choose = (m: Major | 'all') => { setMine(m); setMajor(m); setTopic('all'); setQ(''); setScope('all'); setStage('app') }
+  const choose = (m: Major) => { setMine(m); setMajor(m); setTopic('all'); setQ(''); setScope('all'); setStage('app') }
   const open = (w: Word) => { setSel(w); setRecent(r => [w.id, ...r.filter(x => x !== w.id)].slice(0, 30)) }
   const toggleFav = (id: string) => setFavs(f => (f.includes(id) ? f.filter(x => x !== id) : [id, ...f]))
-  const rnd = () => data && open(data.words[Math.floor(Math.random() * data.words.length)])
+  const rnd = () => activeWords.length && open(activeWords[Math.floor(Math.random() * activeWords.length)])
   const copy = async (w: Word) => {
     const t = [`${w.ar} (${w.tr}) = ${w.mean}`, w.exAr && `${w.exAr} — ${w.exId}`].filter(Boolean).join('\n')
     try { await navigator.clipboard.writeText(t) } catch { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove() }
@@ -124,8 +122,8 @@ export default function App() {
   }
   const wc = (m: Major) => ({ '--mc': MCOLOR[m] } as React.CSSProperties)
 
-  if (stage === 'cover') return <Cover words={coverWords} onStart={() => { setSeen(true); setStage(mine == null ? 'pick' : 'app') }} />
-  if (stage === 'pick') return <Onboard current={mine} words={data?.words} onPick={choose} onClose={mine != null ? () => setStage('app') : undefined} />
+  if (stage === 'cover') return <Cover words={coverWords} onStart={() => { setSeen(true); setStage(mine == null || mine === 'all' ? 'pick' : 'app') }} />
+  if (stage === 'pick') return <Onboard current={mine === 'all' ? null : mine} words={data?.words} onPick={choose} onClose={mine != null && mine !== 'all' ? () => setStage('app') : undefined} />
 
   const star = 'm12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z'
   return (
@@ -136,18 +134,13 @@ export default function App() {
           <button className="btn tune" onClick={() => setCfg(true)} aria-label="Pengaturan tampilan"><Ic d="M4 6h9m4 0h3M4 12h3m4 0h9M4 18h11m4 0h1" /><span>Tampilan</span></button></div>
       </header>
       <main className="main">
-        <button className="me" onClick={() => setStage('pick')} aria-label="Ganti jurusan"><i className="dot" style={{ '--mc': mine && mine !== 'all' ? MCOLOR[mine] : 'var(--mut)' } as React.CSSProperties} />{mine && mine !== 'all' ? `Jurusan ${mine}` : 'Semua jurusan'}<span>Ganti</span></button>
-        <h1 className="h">Cari kata<span>.</span></h1>
+        <button className="me glass" onClick={() => setStage('pick')} aria-label="Ganti jurusan"><i className="dot" style={{ '--mc': MCOLOR[major] } as React.CSSProperties} /><span className="me-copy"><small>Jurusan aktif</small><b>{major}</b></span><span className="switch-label">Ganti</span></button>
+        <section className="hero"><p className="eyebrow">Kamus vokasi · fokus jurusan</p><h1 className="h">Kosakata {major}<span>.</span></h1><p className="hero-sub">Pencarian dikunci ke jurusan aktif agar hasil tetap relevan. Ganti jurusan untuk menjelajah bidang lain.</p></section>
         <div className="sbar"><Ic d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4-4" />
-          <input type="search" dir="auto" value={q} onChange={e => setQ(e.target.value)} placeholder="Arab atau Indonesia…" aria-label="Cari kata" />
+          <input type="search" dir="auto" value={q} onChange={e => setQ(e.target.value)} placeholder={`Cari kosakata ${major}…`} aria-label={`Cari kosakata jurusan ${major}`} />
           {q && <button className="icon" onClick={() => setQ('')} aria-label="Hapus pencarian"><Ic d="M6 6l12 12M18 6 6 18" /></button>}</div>
         <div className="seg" role="group" aria-label="Tampilkan">
           {([['all', 'Semua'], ['fav', `Favorit ${favs.length}`], ['recent', `Terakhir ${recent.length}`]] as [Scope, string][]).map(([k, l]) => <button key={k} aria-pressed={scope === k} onClick={() => setScope(k)}>{l}</button>)}
-        </div>
-        <div className="chips" role="group" aria-label="Filter jurusan">
-          {([['all', 'Semua Kata'], ...MAJORS.map(m => [m.key, m.key] as const)] as [string, string][]).map(([k, l]) => (
-            <button key={k} style={k !== 'all' ? wc(k as Major) : undefined} aria-pressed={major === k} onClick={() => setMajor(k as Major | 'all')} title={MAJORS.find(m => m.key === k)?.full}>
-              {k !== 'all' && <i className="dot" />}{l}<small>{counts[k] ?? 0}</small></button>))}
         </div>
         {topics.length > 0 && <div className="chips topics" role="group" aria-label="Kategori kata">
           <button aria-pressed={topic === 'all'} onClick={() => setTopic('all')}>Semua kategori</button>
@@ -156,10 +149,10 @@ export default function App() {
         {err && <div className="state" role="alert"><p>{err}</p><button className="btn" onClick={() => setTries(t => t + 1)}>Coba lagi</button></div>}
         {!data && !err && <div className="state" role="status"><span className="ld" aria-hidden />Memuat kamus…</div>}
         {data && <>
-          {daily && !q && scope === 'all' && topic === 'all' && (major === 'all' || major === mine) && (
+          {daily && !q && scope === 'all' && topic === 'all' && (
             <button className="daily" onClick={() => open(daily)} style={wc(daily.major)}>
               <span className="eyebrow">Kata hari ini</span><span className="ar" lang="ar" dir="rtl">{daily.ar}</span><span className="dm">{daily.mean}</span></button>)}
-          <p className="count" aria-live="polite">{shown.length} kata{q && <> untuk “{q}”</>}{data.skipped > 0 && <> · {data.skipped} baris dilewati</>}</p>
+          <p className="count" aria-live="polite"><b>{shown.length}</b> kata di {major}{q && <> untuk “{q}”</>}{data.skipped > 0 && <> · {data.skipped} baris dilewati</>}</p>
           {shown.length ? <>
             <ul className="list">{shown.slice(0, lim).map(({ w }) => (
               <li key={w.id} className="row" style={wc(w.major)}>
@@ -170,8 +163,8 @@ export default function App() {
               </li>))}</ul>
             {shown.length > lim && <button className="btn more" onClick={() => setLim(l => l + 60)}>Tampilkan lebih banyak</button>}
           </> : <div className="state"><span className="ld" aria-hidden />
-            <p>{q ? `Tidak ada hasil untuk “${q}”${major !== 'all' ? ` di ${major}` : ''}${topic !== 'all' ? ` · ${topic}` : ''}.` : scope === 'fav' ? 'Belum ada favorit. Tekan bintang pada sebuah kata.' : scope === 'recent' ? 'Belum ada kata yang dilihat.' : 'Belum ada kata di kategori ini.'}</p>
-            {(q || major !== 'all' || scope !== 'all' || topic !== 'all') && <button className="btn" onClick={() => { setQ(''); setMajor('all'); setScope('all'); setTopic('all') }}>Reset</button>}</div>}
+            <p>{q ? `Tidak ada hasil untuk “${q}” di jurusan ${major}${topic !== 'all' ? ` · ${topic}` : ''}.` : scope === 'fav' ? `Belum ada favorit di ${major}.` : scope === 'recent' ? `Belum ada riwayat kata di ${major}.` : 'Belum ada kata di kategori ini.'}</p>
+            {(q || scope !== 'all' || topic !== 'all') && <button className="btn" onClick={() => { setQ(''); setScope('all'); setTopic('all') }}>Reset filter</button>}</div>}
         </>}
         <footer className="foot"><button className="lnk" onClick={() => setCfg(true)}>Sesuaikan huruf, warna &amp; tema</button><br />Lughati Vokasi · SMK Muhammadiyah Pencongan · Sultan Bagus Permadi</footer>
       </main>
