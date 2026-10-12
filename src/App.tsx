@@ -35,9 +35,8 @@ function Dialog({ open, onClose, title, children }: { open: boolean; onClose: ()
 export default function App() {
   const [prefs, setPrefs] = usePersisted('prefs', DEFAULTS)
   const p = { ...DEFAULTS, ...prefs }
-  const [seen, setSeen] = usePersisted('seen', false)
   const [mine, setMine] = usePersisted<Major | 'all' | null>('mine', null)
-  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>(!seen ? 'cover' : mine == null || mine === 'all' ? 'pick' : 'app')
+  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>('cover')
   const [topic, setTopic] = useState('all')
   const [favs, setFavs] = usePersisted<string[]>('favs', [])
   const [recent, setRecent] = usePersisted<string[]>('recent', [])
@@ -128,7 +127,7 @@ export default function App() {
   }
   const wc = (m: Major) => ({ '--mc': MCOLOR[m] } as React.CSSProperties)
 
-  if (stage === 'cover') return <Cover words={coverWords} onStart={() => { setSeen(true); setStage(mine == null || mine === 'all' ? 'pick' : 'app') }} />
+  if (stage === 'cover') return <Cover words={coverWords} onStart={() => setStage(mine == null || mine === 'all' ? 'pick' : 'app')} />
   if (stage === 'pick') return <Onboard current={mine === 'all' ? null : mine} words={data?.words} onPick={choose} onClose={mine != null && mine !== 'all' ? () => setStage('app') : undefined} />
 
   const star = 'm12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z'
