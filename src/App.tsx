@@ -2,6 +2,7 @@ import { useEffect, useDeferredValue, useMemo, useRef, useState, type ReactNode 
 import Cover from './Cover'
 import Onboard from './Onboard'
 import Settings from './Settings'
+import BrandLogo from './BrandLogo'
 import { renderStory, STYLES } from './lib/share'
 import { MCOLOR, AR_FONTS, DEFAULTS, ID_FONTS, MAJORS, dailyWord, norm, parseDataset, search, usePersisted, type Major, type Similar, type Word } from './lib/core'
 
@@ -134,7 +135,7 @@ export default function App() {
   return (
     <div className="page">
       <header className="hd">
-        <button className="brand" onClick={() => setStage('cover')} aria-label="Kembali ke sampul"><span className="logo" lang="ar">ل</span><b>Lughati</b></button>
+        <button className="brand" onClick={() => setStage('cover')} aria-label="Kembali ke sampul"><span className="logo-shell"><BrandLogo decorative /></span><b>Lughati</b></button>
         <div className="hdr"><button className="icon" onClick={rnd} aria-label="Kata acak" title="Kata acak"><Ic d="M3 7h4l10 10h4M3 17h4l3-3m4-4 3-3h4M18 4l3 3-3 3M18 14l3 3-3 3" /></button>
           <button className="btn tune" onClick={() => setCfg(true)} aria-label="Pengaturan tampilan"><Ic d="M4 6h9m4 0h3M4 12h3m4 0h9M4 18h11m4 0h1" /><span>Tampilan</span></button></div>
       </header>

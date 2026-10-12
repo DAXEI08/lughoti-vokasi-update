@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import BrandLogo from './BrandLogo'
 
 export default function Cover({ onStart, words }: { onStart: () => void; words: string[] }) {
   // Real vocabulary from the dataset drifts behind the title (decorative only)
@@ -11,8 +12,8 @@ export default function Cover({ onStart, words }: { onStart: () => void; words: 
       </div>
       <p className="pill"><i />SMK Muhammadiyah Pencongan</p>
       <div className="cmid">
-        <h1 className="giant" lang="ar" dir="rtl">لُغَتِي</h1>
-        <h2>Lughati Vokasi</h2>
+        <div className="cover-logo-shell"><BrandLogo className="cover-logo" /></div>
+        <h1 className="cover-wordmark">Lughati Vokasi</h1>
         <p>Kamus Digital Arab–Indonesia untuk Siswa SMK</p>
       </div>
       <div className="cbot">
