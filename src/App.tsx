@@ -169,6 +169,18 @@ export default function App() {
         <footer className="foot"><button className="lnk" onClick={() => setCfg(true)}>Sesuaikan huruf, warna &amp; tema</button><br />Lughati Vokasi · SMK Muhammadiyah Pencongan · Sultan Bagus Permadi</footer>
       </main>
 
+      <nav className="dock glass" aria-label="Navigasi cepat">
+        <button onClick={() => { window.scrollTo({ top: 0, behavior: p.calm ? 'auto' : 'smooth' }); requestAnimationFrame(() => document.querySelector<HTMLInputElement>('.sbar input')?.focus({ preventScroll: true })) }} aria-label="Kembali ke pencarian">
+          <Ic d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4-4" /><span>Cari</span>
+        </button>
+        <button onClick={() => setStage('pick')} aria-label={`Ganti jurusan dari ${major}`}>
+          <Ic d="M4 5h16M7 5v14m10-14v14M4 19h16" /><span>Jurusan</span><b>{major}</b>
+        </button>
+        <button onClick={() => setCfg(true)} aria-label="Buka pengaturan tampilan">
+          <Ic d="M4 6h9m4 0h3M4 12h3m4 0h9M4 18h11m4 0h1" /><span>Tampilan</span>
+        </button>
+      </nav>
+
       <Dialog open={!!sel} onClose={() => setSel(null)} title="Detail kata">
         {sel && <article className="detail" style={wc(sel.major)}>
           <div className="ar big" lang="ar" dir="rtl">{sel.ar}</div>
