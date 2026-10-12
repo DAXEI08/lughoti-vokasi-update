@@ -35,8 +35,8 @@ export default function App() {
   const [prefs, setPrefs] = usePersisted('prefs', DEFAULTS)
   const p = { ...DEFAULTS, ...prefs }
   const [seen, setSeen] = usePersisted('seen', false)
-  const [mine, setMine] = usePersisted<Major | null>('mine', null)
-  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>(!seen ? 'cover' : mine == null ? 'pick' : 'app')
+  const [mine, setMine] = usePersisted<Major | 'all' | null>('mine', null)
+  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>(!seen ? 'cover' : mine == null || mine === 'all' ? 'pick' : 'app')
   const [topic, setTopic] = useState('all')
   const [favs, setFavs] = usePersisted<string[]>('favs', [])
   const [recent, setRecent] = usePersisted<string[]>('recent', [])
@@ -45,7 +45,7 @@ export default function App() {
   const [tries, setTries] = useState(0)
   const [q, setQ] = useState('')
   const dq = useDeferredValue(q)
-  const [major, setMajor] = useState<Major>(mine ?? 'RPL')
+  const [major, setMajor] = useState<Major>(mine && mine !== 'all' ? mine : 'RPL')
   const [scope, setScope] = useState<Scope>('all')
   const [lim, setLim] = useState(60)
   const [sel, setSel] = useState<Word | null>(null)
@@ -95,7 +95,7 @@ export default function App() {
   const shown = useMemo(() => (topic === 'all' ? base : base.filter(h => h.w.topic === topic)), [base, topic])
   const daily = useMemo(() => {
     if (!data) return null
-    return dailyWord(activeWords.length ? activeWords : data.words)
+    return activeWords.length ? dailyWord(activeWords) : null
   }, [data, activeWords])
   const similar = sel && data ? data.similar.filter(s => (s.a1 === sel.ar || s.a2 === sel.ar) && (s.scope === 'all' || s.scope === sel.major || !s.scope)) : []
   const coverWords = useMemo(() => (data ? data.words.filter((_, i) => i % 23 === 0).map(w => w.ar) : []), [data])
@@ -122,8 +122,8 @@ export default function App() {
   }
   const wc = (m: Major) => ({ '--mc': MCOLOR[m] } as React.CSSProperties)
 
-  if (stage === 'cover') return <Cover words={coverWords} onStart={() => { setSeen(true); setStage(mine == null ? 'pick' : 'app') }} />
-  if (stage === 'pick') return <Onboard current={mine} words={data?.words} onPick={choose} onClose={mine != null ? () => setStage('app') : undefined} />
+  if (stage === 'cover') return <Cover words={coverWords} onStart={() => { setSeen(true); setStage(mine == null || mine === 'all' ? 'pick' : 'app') }} />
+  if (stage === 'pick') return <Onboard current={mine === 'all' ? null : mine} words={data?.words} onPick={choose} onClose={mine != null && mine !== 'all' ? () => setStage('app') : undefined} />
 
   const star = 'm12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z'
   return (
