@@ -18,12 +18,14 @@ export function usePersisted<T>(k: string, d: T) {
 
 /* ---------- data model ---------- */
 export type Major = 'RPL' | 'TBKR' | 'Akuntansi' | 'TSM' | 'Umum'
-export const MAJORS: { key: Major; full: string }[] = [
-  { key: 'RPL', full: 'Software Engineering' },
-  { key: 'TBKR', full: 'Automotive Body Repair' },
-  { key: 'Akuntansi', full: 'Akuntansi' },
-  { key: 'TSM', full: 'Motorcycle Engineering' },
-  { key: 'Umum', full: 'Kosakata umum' },
+// `key` is the stable identifier stored in favourites/prefs and the dataset - never rename it.
+// `full` is the unabbreviated Indonesian name and `ar` its Arabic equivalent, both for display only.
+export const MAJORS: { key: Major; full: string; ar: string }[] = [
+  { key: 'RPL', full: 'Rekayasa Perangkat Lunak', ar: 'هندسة البرمجيات' },
+  { key: 'TBKR', full: 'Teknik Bodi Kendaraan Ringan', ar: 'تقنية هياكل المركبات الخفيفة' },
+  { key: 'Akuntansi', full: 'Akuntansi', ar: 'المحاسبة' },
+  { key: 'TSM', full: 'Teknik Sepeda Motor', ar: 'تقنية الدراجات النارية' },
+  { key: 'Umum', full: 'Kosakata umum', ar: 'مفردات عامة' },
 ]
 export interface Word {
   id: string; major: Major; ar: string; tr: string; mean: string; topic: string; exAr: string; exId: string
