@@ -85,12 +85,17 @@ export default function App() {
 
   const byId = useMemo(() => new Map(data?.words.map(w => [w.id, w])), [data])
   const activeWords = useMemo(() => (data ? data.words.filter(w => w.major === major) : []), [data, major])
+  const activeIds = useMemo(() => new Set(activeWords.map(w => w.id)), [activeWords])
+  const activeFavIds = useMemo(() => favs.filter(id => activeIds.has(id) && byId.has(id)), [favs, activeIds, byId])
+  const activeRecentIds = useMemo(() => recent.filter(id => activeIds.has(id) && byId.has(id)), [recent, activeIds, byId])
   const hits = useMemo(() => search(activeWords, dq), [activeWords, dq])
   const base = useMemo(() => {
     if (scope === 'all') return hits
-    const ids = scope === 'fav' ? favs : recent; const set = new Set(ids)
-    const l = hits.filter(h => set.has(h.w.id)); return dq ? l : l.sort((a, b) => ids.indexOf(a.w.id) - ids.indexOf(b.w.id))
-  }, [hits, scope, favs, recent, dq])
+    const ids = scope === 'fav' ? activeFavIds : activeRecentIds
+    const set = new Set(ids)
+    const l = hits.filter(h => set.has(h.w.id))
+    return dq ? l : l.sort((a, b) => ids.indexOf(a.w.id) - ids.indexOf(b.w.id))
+  }, [hits, scope, activeFavIds, activeRecentIds, dq])
   const topics = useMemo(() => { const m = new Map<string, number>(); base.forEach(h => { if (h.w.topic) m.set(h.w.topic, (m.get(h.w.topic) || 0) + 1) }); return [...m].sort((a, b) => b[1] - a[1]) }, [base])
   const shown = useMemo(() => (topic === 'all' ? base : base.filter(h => h.w.topic === topic)), [base, topic])
   const daily = useMemo(() => {
@@ -104,7 +109,7 @@ export default function App() {
   useEffect(() => setTopic('all'), [major])
   useEffect(() => { if (topic !== 'all' && !topics.some(t => t[0] === topic)) setTopic('all') }, [topic, topics])
   const choose = (m: Major) => { setMine(m); setMajor(m); setTopic('all'); setQ(''); setScope('all'); setStage('app') }
-  const open = (w: Word) => { setSel(w); setRecent(r => [w.id, ...r.filter(x => x !== w.id)].slice(0, 30)) }
+  const open = (w: Word) => { setSel(w); setRecent(r => [w.id, ...r.filter(x => x !== w.id)].slice(0, 120)) }
   const toggleFav = (id: string) => setFavs(f => (f.includes(id) ? f.filter(x => x !== id) : [id, ...f]))
   const rnd = () => activeWords.length && open(activeWords[Math.floor(Math.random() * activeWords.length)])
   const copy = async (w: Word) => {
@@ -140,7 +145,7 @@ export default function App() {
           <input type="search" dir="auto" value={q} onChange={e => setQ(e.target.value)} placeholder={`Cari kosakata ${major}…`} aria-label={`Cari kosakata jurusan ${major}`} />
           {q && <button className="icon" onClick={() => setQ('')} aria-label="Hapus pencarian"><Ic d="M6 6l12 12M18 6 6 18" /></button>}</div>
         <div className="seg" role="group" aria-label="Tampilkan">
-          {([['all', 'Semua'], ['fav', `Favorit ${favs.length}`], ['recent', `Terakhir ${recent.length}`]] as [Scope, string][]).map(([k, l]) => <button key={k} aria-pressed={scope === k} onClick={() => setScope(k)}>{l}</button>)}
+          {([['all', `Semua ${activeWords.length}`], ['fav', `Favorit ${activeFavIds.length}`], ['recent', `Terakhir ${activeRecentIds.length}`]] as [Scope, string][]).map(([k, l]) => <button key={k} aria-pressed={scope === k} onClick={() => setScope(k)}>{l}</button>)}
         </div>
         {topics.length > 0 && <div className="chips topics" role="group" aria-label="Kategori kata">
           <button aria-pressed={topic === 'all'} onClick={() => setTopic('all')}>Semua kategori</button>
