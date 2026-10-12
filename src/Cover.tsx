@@ -1,25 +1,37 @@
 import { useMemo } from 'react'
-import BrandLogo from './BrandLogo'
 
 export default function Cover({ onStart, words }: { onStart: () => void; words: string[] }) {
-  // Real vocabulary from the dataset drifts behind the title (decorative only)
-  const rows = useMemo(() => [0, 1, 2].map(r => words.filter((_, i) => i % 3 === r).slice(0, 14)), [words])
+  const rows = useMemo(() => {
+    const source = words.length ? words : ['بَرْمَجَة', 'حِسَاب', 'مُحَرِّك', 'دَرَّاجَة', 'شَبَكَة', 'مِهْنَة']
+    return [0, 1, 2].map(row =>
+      source.filter((_, i) => i % 3 === row).slice(0, 12)
+    )
+  }, [words])
+
   return (
-    <main className="cover">
-      <div className="blobs" aria-hidden />
-      <div className="marq" aria-hidden>
-        {rows.map((r, i) => r.length > 0 && <div key={i} className={'mrow' + (i === 1 ? ' rev' : '')}><div>{[...r, ...r].map((w, j) => <span key={j} lang="ar" dir="rtl">{w}</span>)}</div></div>)}
+    <main className="cover cover-v2">
+      <div className="cover-aurora" aria-hidden />
+      <div className="cover-marquee" aria-hidden>
+        {rows.map((row, i) => (
+          <div key={i} className={'cover-marquee-row' + (i === 1 ? ' reverse' : '')}>
+            <div className="cover-marquee-track">
+              {[...row, ...row].map((word, j) => (
+                <span key={j} lang="ar" dir="rtl">{word}</span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
-      <p className="pill"><i />SMK Muhammadiyah Pencongan</p>
-      <div className="cmid">
-        <div className="cover-logo-shell"><BrandLogo className="cover-logo" /></div>
-        <h1 className="cover-wordmark">Lughati Vokasi</h1>
-        <p>Kamus Digital Arab–Indonesia untuk Siswa SMK</p>
-      </div>
-      <div className="cbot">
-        <button className="cta" onClick={onStart} autoFocus>Mulai Belajar <span aria-hidden>→</span></button>
-        <small>Dibuat oleh Sultan Bagus Permadi</small>
-      </div>
+
+      <section className="cover-card" aria-labelledby="cover-title">
+        <p className="cover-school">SMK Muhammadiyah Pencongan</p>
+        <h1 id="cover-title" className="cover-arabic" lang="ar" dir="rtl">لُغَتِي</h1>
+        <h2 className="cover-title">Lughati Vokasi</h2>
+        <p className="cover-author">Author: Sultan Bagus Permadi</p>
+        <button className="cover-cta" onClick={onStart} autoFocus>
+          Mulai Belajar <span aria-hidden>→</span>
+        </button>
+      </section>
     </main>
   )
 }
