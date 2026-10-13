@@ -2,6 +2,7 @@ import { useEffect, useDeferredValue, useMemo, useRef, useState, type ReactNode 
 import Cover from './Cover'
 import Onboard from './Onboard'
 import Settings from './Settings'
+import About from './About'
 import BrandLogo from './BrandLogo'
 import { renderStory, STYLES } from './lib/share'
 import { MCOLOR, AR_FONTS, DEFAULTS, ID_FONTS, MAJORS, dailyWord, norm, parseDataset, search, usePersisted, type Major, type Similar, type Word } from './lib/core'
@@ -36,8 +37,10 @@ export default function App() {
   const [prefs, setPrefs] = usePersisted('prefs', DEFAULTS)
   const p = { ...DEFAULTS, ...prefs }
   const [mine, setMine] = usePersisted<Major | 'all' | null>('mine', null)
-  const [stage, setStage] = useState<'cover' | 'pick' | 'app'>('cover')
+  const [stage, setStage] = useState<'cover' | 'pick' | 'app' | 'about'>('cover')
   const [topic, setTopic] = useState('all')
+  const [aboutFrom, setAboutFrom] = useState<'cover' | 'app'>('app')
+  const [aboutSeen, setAboutSeen] = usePersisted('aboutSeen', false)
   const [favs, setFavs] = usePersisted<string[]>('favs', [])
   const [recent, setRecent] = usePersisted<string[]>('recent', [])
   const [data, setData] = useState<Data | null>(null)
@@ -103,6 +106,7 @@ export default function App() {
     return activeWords.length ? dailyWord(activeWords) : null
   }, [data, activeWords])
   const similar = sel && data ? data.similar.filter(s => (s.a1 === sel.ar || s.a2 === sel.ar) && (s.scope === 'all' || s.scope === sel.major || !s.scope)) : []
+  const counts = useMemo(() => { if (!data) return null; const m = new Map<Major, number>(); data.words.forEach(w => m.set(w.major, (m.get(w.major) ?? 0) + 1)); return m }, [data])
   const coverWords = useMemo(() => (data ? data.words.filter((_, i) => i % 23 === 0).map(w => w.ar) : []), [data])
 
   useEffect(() => setLim(60), [dq, major, scope, topic])
@@ -125,9 +129,11 @@ export default function App() {
     if (navigator.canShare?.({ files: [f] })) { try { await navigator.share({ files: [f], title: 'Lughati Vokasi', text: `${shareW.ar} = ${shareW.mean}` }) } catch (e) { if ((e as Error).name !== 'AbortError') download() } }
     else download()
   }
+  const openAbout = (from: 'cover' | 'app') => { setAboutFrom(from); setAboutSeen(true); setStage('about') }
   const wc = (m: Major) => ({ '--mc': MCOLOR[m] } as React.CSSProperties)
 
-  if (stage === 'cover') return <Cover words={coverWords} onStart={() => setStage(mine == null || mine === 'all' ? 'pick' : 'app')} />
+  if (stage === 'about') return <About counts={counts} onBack={() => setStage(aboutFrom)} />
+  if (stage === 'cover') return <Cover words={coverWords} onStart={() => setStage(mine == null || mine === 'all' ? 'pick' : 'app')} onAbout={() => openAbout('cover')} />
   if (stage === 'pick') return <Onboard current={mine === 'all' ? null : mine} words={data?.words} onPick={choose} onClose={mine != null && mine !== 'all' ? () => setStage('app') : undefined} />
 
   const star = 'm12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z'
@@ -141,6 +147,9 @@ export default function App() {
       <main className="main">
         <button className="me glass" onClick={() => setStage('pick')} aria-label="Ganti jurusan"><i className="dot" style={{ '--mc': MCOLOR[major] } as React.CSSProperties} /><span className="me-copy"><small>Jurusan aktif</small><b>{major}</b></span><span className="switch-label">Ganti</span></button>
         <section className="hero"><p className="eyebrow">Kamus vokasi · fokus jurusan</p><h1 className="h">Kosakata {major}<span>.</span></h1><p className="hero-sub">Pencarian dikunci ke jurusan aktif agar hasil tetap relevan. Ganti jurusan untuk menjelajah bidang lain.</p></section>
+        {!aboutSeen && <div className="teaser" role="note">
+          <button className="teaser__open" onClick={() => openAbout('app')}><b>Kenapa kamus ini dibuat?</b><span>Bahasa Arab yang nyambung dengan jurusanmu. Baca ceritanya.</span></button>
+          <button className="icon" onClick={() => setAboutSeen(true)} aria-label="Tutup pengantar">✕</button></div>}
         <div className="sbar"><Ic d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4-4" />
           <input type="search" dir="auto" value={q} onChange={e => setQ(e.target.value)} placeholder={`Cari kosakata ${major}…`} aria-label={`Cari kosakata jurusan ${major}`} />
           {q && <button className="icon" onClick={() => setQ('')} aria-label="Hapus pencarian"><Ic d="M6 6l12 12M18 6 6 18" /></button>}</div>
@@ -171,7 +180,7 @@ export default function App() {
             <p>{q ? `Tidak ada hasil untuk “${q}” di jurusan ${major}${topic !== 'all' ? ` · ${topic}` : ''}.` : scope === 'fav' ? `Belum ada favorit di ${major}.` : scope === 'recent' ? `Belum ada riwayat kata di ${major}.` : 'Belum ada kata di kategori ini.'}</p>
             {(q || scope !== 'all' || topic !== 'all') && <button className="btn" onClick={() => { setQ(''); setScope('all'); setTopic('all') }}>Reset filter</button>}</div>}
         </>}
-        <footer className="foot"><button className="lnk" onClick={() => setCfg(true)}>Sesuaikan huruf, warna &amp; tema</button><br />Lughati Vokasi · SMK Muhammadiyah Pencongan · Sultan Bagus Permadi</footer>
+        <footer className="foot"><button className="lnk" onClick={() => setCfg(true)}>Sesuaikan huruf, warna &amp; tema</button> · <button className="lnk" onClick={() => openAbout('app')}>Tentang kamus ini</button><br />Lughati Vokasi · SMK Muhammadiyah Pencongan · Sultan Bagus Permadi</footer>
       </main>
 
       <nav className="dock glass" aria-label="Navigasi cepat">
@@ -183,6 +192,9 @@ export default function App() {
         </button>
         <button onClick={() => setCfg(true)} aria-label="Buka pengaturan tampilan">
           <Ic d="M4 6h9m4 0h3M4 12h3m4 0h9M4 18h11m4 0h1" /><span>Tampilan</span>
+        </button>
+        <button onClick={() => openAbout('app')} aria-label="Tentang kamus ini">
+          <Ic d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8h.01" /><span>Tentang</span>
         </button>
       </nav>
 

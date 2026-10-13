@@ -196,3 +196,6 @@
   .immersive-cover__track,.immersive-cover__orb,.immersive-cover__reveal{animation:none!important}
   .immersive-cover__hero,.immersive-cover__aurora{transform:none!important}
 }
+
+.immersive-cover__about{padding:.5rem 1rem;border-radius:999px;color:color-mix(in srgb,var(--ink) 70%,var(--mut));font-size:.82rem;font-weight:650;text-decoration:underline;text-underline-offset:.25em;text-decoration-color:color-mix(in srgb,var(--acc) 50%,transparent)}
+.immersive-cover__about:focus-visible{outline:2px solid var(--acc);outline-offset:3px}

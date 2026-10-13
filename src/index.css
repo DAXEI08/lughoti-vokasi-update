@@ -190,7 +190,7 @@ dialog{background:var(--glass-strong);border:1px solid var(--glass-line);backdro
 /* persistent quick navigation */
 .dock{
   position:fixed;left:50%;bottom:max(.7rem,env(safe-area-inset-bottom));translate:-50% 0;
-  z-index:30;width:min(calc(100% - 1rem),30rem);display:grid;grid-template-columns:repeat(3,1fr);
+  z-index:30;width:min(calc(100% - 1rem),30rem);display:grid;grid-template-columns:repeat(4,1fr);
   gap:.3rem;padding:.42rem;border-radius:22px;background:var(--glass-strong);
   border:1px solid var(--glass-line);box-shadow:0 18px 55px #0004;
   backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%)
@@ -202,7 +202,7 @@ dialog{background:var(--glass-strong);border:1px solid var(--glass-line);backdro
 .dock b{position:absolute;right:.45rem;top:.35rem;padding:.08rem .32rem;border-radius:999px;background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc);font-size:.55rem;line-height:1.4}
 .main{padding-bottom:max(7rem,calc(env(safe-area-inset-bottom) + 6rem))}
 @media(min-width:900px){
-  .dock{width:24rem;bottom:1rem;opacity:.92}
+  .dock{width:30rem;bottom:1rem;opacity:.92}
   .dock button{min-height:3rem}
 }
 

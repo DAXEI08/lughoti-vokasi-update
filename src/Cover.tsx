@@ -4,6 +4,7 @@ import './cover.css'
 
 type CoverProps = {
   onStart: () => void
+  onAbout?: () => void
   words: string[]
 }
 
@@ -21,7 +22,7 @@ const LOOP_COPIES = 3
 
 const stagger = (index: number) => ({ '--i': index }) as CSSProperties
 
-export default function Cover({ onStart, words }: CoverProps) {
+export default function Cover({ onStart, onAbout, words }: CoverProps) {
   const rootRef = useRef<HTMLElement>(null)
   const frameRef = useRef(0)
 
@@ -118,6 +119,7 @@ export default function Cover({ onStart, words }: CoverProps) {
             <svg viewBox="0 0 24 24"><path d="M5 12h13M13 7l5 5-5 5" /></svg>
           </span>
         </button>
+        {onAbout && <button type="button" className="immersive-cover__about" onClick={onAbout}>Kenapa kamus ini dibuat?</button>}
       </footer>
     </main>
   )
